@@ -50,7 +50,11 @@ class Researcher:
         for area in areas_de_atuacao_box.children:
             text = area.get_text()
             if 'Grande área' in text:
-                self.areas_of_expertise.append(text.strip())
+                area_of_expertise = text.replace('Grande área:', '')
+                area_of_expertise = area_of_expertise.replace('/ Área:', '>')
+                area_of_expertise = area_of_expertise.replace('/ Subárea:', '>')
+                area_of_expertise = area_of_expertise.replace('/ Especialidade:', '>')
+                self.areas_of_expertise.append(area_of_expertise.strip())
 
     def __get_research_projects(self):
         """Extracts all research projects and returns a list of ResearchProject instances."""
