@@ -1,5 +1,5 @@
 from .researcher import Researcher
-from .lattes import get_researchers_from_folder, build_articles_database
+from .lattes import get_researchers, build_articles_database, build_researchers_report
 
 from nltk.corpus import stopwords
 
