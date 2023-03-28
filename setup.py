@@ -11,5 +11,5 @@ setup(
         'unidecode==1.3.6',
         'nltk==3.8.1'
     ],
-    python_requires='>=3.10',
+    python_requires='>=3.9',
 )
