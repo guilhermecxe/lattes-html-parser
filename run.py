@@ -1,8 +1,9 @@
 from lattes_html_parser import Researcher
 # from lattes_html_parser import build_articles_database
 
-r = Researcher('data/sample-researchers/curriculum_0112036159794570.html')
+r = Researcher(r'data/sample-researchers/curriculum_0112036159794570.html')
 print(r.complete_articles[0].title, r.complete_articles[0].keywords, r.get_keywords())
+print(r.emails)
 
 # rs = get_researchers_from_folder('data/sample-researchers/')
 # for r in rs:

@@ -6,11 +6,14 @@ import re
 
 class Researcher:
     def __init__(self, html_path=None, html_str=None):
+        self.html_str = html_str
         self.__read_html_curriculum(html_path, html_str)
         self.__get_basic_informations()
+        self.__get_address()
         self.__get_areas_of_expertise()
         self.__get_research_projects()
         self.__get_complete_articles_published_in_journals()
+        self.__search_email()
 
     def __str__(self):
         return f'<Researcher: {self.name}>'
@@ -23,7 +26,8 @@ class Researcher:
         which is used to extract researcher informations."""
         if html_path:
             with open(html_path, 'r', encoding='utf-8') as f:
-                self.soup = BeautifulSoup(f.read(), 'html.parser')
+                self.html_str = f.read()
+                self.soup = BeautifulSoup(self.html_str, 'html.parser')
         elif html_str:
             self.soup = BeautifulSoup(html_str, 'html.parser')
 
@@ -34,6 +38,10 @@ class Researcher:
         self.lattes_id = lattes_link.split('/')[-1]
         self.last_update = self.soup.find('ul', class_='informacoes-autor').find_all('li')[-1].get_text().split('em ')[-1]
         self.bio = self.soup.find('p', class_='resumo').get_text()
+
+    def __get_address(self):
+        self.address = self.soup.find('a', attrs={'name': 'Endereco'}).parent.div.get_text()
+        # Depois criar um objeto Address para estruturar essa informação melhor
     
     def __get_areas_of_expertise(self):
         """Extracts researcher areas of expertise returning a list."""
@@ -100,3 +108,8 @@ class Researcher:
             return Counter(keywords).most_common(top)
         else:
             return keywords
+
+    def __search_email(self):
+        EMAIL_PATTERN = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        search_on = ' '.join([self.bio, self.address])
+        self.emails = re.findall(EMAIL_PATTERN, search_on)

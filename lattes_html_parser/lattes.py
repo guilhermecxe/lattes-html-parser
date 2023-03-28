@@ -19,11 +19,12 @@ def build_articles_database(researchers_folder_path, database_path):
                 file.write(f'{r.lattes_id}, {a.title}\n')
 
 def build_researchers_report(researchers, report_path, top_keywords=20):
-    columns = ['name', 'lattes_id', 'last_update', 'areas_of_expertise', 'keywords']
+    columns = ['name', 'lattes_id', 'emails', 'last_update', 'areas_of_expertise', 'keywords']
     report = pd.DataFrame(index=range(len(researchers)), columns=columns)
     for i, r in enumerate(researchers):
         report.loc[i, 'name'] = r.name
         report.loc[i, 'lattes_id'] = r.lattes_id
+        report.loc[i, 'emails'] = ', '.join(r.emails)
         report.loc[i, 'last_update'] = r.last_update
         report.loc[i, 'areas_of_expertise'] = r.areas_of_expertise
         report.loc[i, 'keywords'] = ', '.join([k[0] for k in r.get_keywords(top=top_keywords)])
