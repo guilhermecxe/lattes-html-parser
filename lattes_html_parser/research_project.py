@@ -1,6 +1,4 @@
-from unidecode import unidecode
-from nltk.tokenize import word_tokenize
-import string
+from .utils import keywords_from_text
 
 class ResearchProject:
     def __init__(self, raw_data):
@@ -8,6 +6,7 @@ class ResearchProject:
         self.__get_title()
         self.__get_period()
         self.__get_other_informations()
+        self.__get_keywords()
 
     def __str__(self):
         return f'<ResearchProject: {self.title}>'
@@ -34,11 +33,6 @@ class ResearchProject:
                 informations[key] = value
         self.other_informations = informations
 
-    def get_keywords(self):
-        from . import all_stopwords # importando aqui para evitar import's circulares
+    def __get_keywords(self):
         text = self.title + self.other_informations.get('Descrição', '')
-        tokens = word_tokenize(unidecode(text).lower())
-        tokens_without_punctuation = [token for token in tokens if token not in string.punctuation]
-        keywords = [token for token in tokens_without_punctuation if not token in all_stopwords]
-
-        return keywords
+        self.keywords = keywords_from_text(text)

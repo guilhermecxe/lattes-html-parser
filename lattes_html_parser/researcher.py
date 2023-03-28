@@ -71,7 +71,8 @@ class Researcher:
         """Returns a list of the top keywords in the researcher articles ranked by frequency
         with the elements in the format (word, frequency) if as_counter set to True. If as_counter
         is False, it just returns all keywords found in the articles."""
-        keywords = sum([article.keywords_from_title for article in self.complete_articles], start=[])
+        
+        keywords = sum([article.keywords for article in self.complete_articles], start=[])
         if as_counter:
             return Counter(keywords).most_common(top)
         else:
@@ -81,7 +82,7 @@ class Researcher:
         """Returns a list of the top keywords in the researcher projects ranked by frequency
         with the elements in the format (word, frequency) if as_counter set to True. If as_counter
         is False, it just returns all keywords found in the projects."""
-        keywords = sum([project.get_keywords() for project in self.research_projects], start=[])
+        keywords = sum([project.keywords for project in self.research_projects], start=[])
         if as_counter:
             return Counter(keywords).most_common(top)
         else:

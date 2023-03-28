@@ -1,7 +1,4 @@
-from unidecode import unidecode
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import string
+from .utils import keywords_from_text
 
 class Article:
     def __init__(self, raw_data):
@@ -12,7 +9,7 @@ class Article:
         self.__get_title()
         self.__get_publiser()
         self.__get_authors()
-        self.__get_keywords_from_title()
+        self.__get_keywords()
 
     def __get_doi(self):
         doi_element = self.raw_data.find('a', class_='icone-doi')
@@ -48,8 +45,6 @@ class Article:
         authors_string = messy_data.split(self.title)[0]
         self.authors = list(map(lambda s: s.strip(' .'), authors_string.split(';')))
 
-    def __get_keywords_from_title(self):
-        from . import all_stopwords # importando aqui para evitar import's circulares
-        tokens = word_tokenize(unidecode(self.title).lower())
-        tokens_without_punctuation = [token for token in tokens if token not in string.punctuation]
-        self.keywords_from_title = [token for token in tokens_without_punctuation if not token in all_stopwords]
+    def __get_keywords(self):
+        text = self.title
+        self.keywords = keywords_from_text(text)

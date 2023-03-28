@@ -10,6 +10,7 @@ setup(
         'beautifulsoup4==4.11.1',
         'unidecode==1.3.6',
         'nltk==3.8.1'
+        'pandas==1.4.0'
     ],
     python_requires='>=3.9',
 )
