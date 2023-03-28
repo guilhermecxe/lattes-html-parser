@@ -53,7 +53,7 @@ class Researcher:
                 area_of_expertise = text.replace('Grande área:', '')
                 area_of_expertise = area_of_expertise.replace('/ Área:', '>')
                 area_of_expertise = area_of_expertise.replace('/ Subárea:', '>')
-                area_of_expertise = area_of_expertise.replace('/ Especialidade:', '>')
+                area_of_expertise = area_of_expertise.replace('/Especialidade:', ' >')
                 self.areas_of_expertise.append(area_of_expertise.strip())
 
     def __get_research_projects(self):
