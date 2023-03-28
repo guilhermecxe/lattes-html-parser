@@ -5,8 +5,8 @@ from collections import Counter
 import re
 
 class Researcher:
-    def __init__(self, html_curriculum_path):
-        self.__read_html_curriculum(html_curriculum_path)
+    def __init__(self, html_path=None, html_str=None):
+        self.__read_html_curriculum(html_path, html_str)
         self.__get_basic_informations()
         self.__get_areas_of_expertise()
         self.__get_research_projects()
@@ -18,11 +18,14 @@ class Researcher:
     def __repr__(self):
         return self.__str__()
 
-    def __read_html_curriculum(self, html_curriculum_path):
+    def __read_html_curriculum(self, html_path=None, html_str=None):
         """It receives the path to a curriculum in html format and creates the soup object,
         which is used to extract researcher informations."""
-        with open(html_curriculum_path, 'r', encoding='utf-8') as f:
-            self.soup = BeautifulSoup(f.read(), 'html.parser')
+        if html_path:
+            with open(html_path, 'r', encoding='utf-8') as f:
+                self.soup = BeautifulSoup(f.read(), 'html.parser')
+        elif html_str:
+            self.soup = BeautifulSoup(html_str, 'html.parser')
 
     def __get_basic_informations(self):
         """Extracts this researcher informations: name, lattes id, last update on lattes and bio."""
@@ -96,5 +99,3 @@ class Researcher:
             return Counter(keywords).most_common(top)
         else:
             return keywords
-    
-    
