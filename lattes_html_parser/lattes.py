@@ -26,5 +26,5 @@ def build_researchers_report(researchers, report_path, top_keywords=20):
         report.loc[i, 'lattes_id'] = r.lattes_id
         report.loc[i, 'last_update'] = r.last_update
         report.loc[i, 'areas_of_expertise'] = r.areas_of_expertise
-        report.loc[i, 'keywords'] = r.get_keywords(top=top_keywords)
+        report.loc[i, 'keywords'] = ', '.join([k[0] for k in r.get_keywords(top=top_keywords)])
     report.to_excel(report_path, index=0)
