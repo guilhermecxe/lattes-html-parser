@@ -1,8 +1,10 @@
-from .research_project import ResearchProject
-from .article import Article
 from bs4 import BeautifulSoup
 from collections import Counter
 import re
+
+from .research_project import ResearchProject
+from .article import Article
+from .address import Address
 
 class Researcher:
     def __init__(self, html_path=None, html_str=None):
@@ -40,8 +42,8 @@ class Researcher:
         self.bio = self.soup.find('p', class_='resumo').get_text()
 
     def __get_address(self):
-        self.address = self.soup.find('a', attrs={'name': 'Endereco'}).parent.div.get_text()
-        # Depois criar um objeto Address para estruturar essa informação melhor
+        address_soup = self.soup.find('a', attrs={'name': 'Endereco'}).parent.div
+        self.address = Address(address_soup) if address_soup.get_text() else None
     
     def __get_areas_of_expertise(self):
         """Extracts researcher areas of expertise returning a list."""
@@ -115,5 +117,6 @@ class Researcher:
 
     def __search_email(self):
         EMAIL_PATTERN = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        search_on = ' '.join([self.bio, self.address])
+        address = self.address.soup.get_text() if self.address else ''
+        search_on = ' '.join([self.bio, address])
         self.emails = re.findall(EMAIL_PATTERN, search_on)
