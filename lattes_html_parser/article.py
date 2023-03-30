@@ -34,7 +34,7 @@ class Article:
             element = self.raw_data.find('div', class_='citado').get('cvuri')
         except AttributeError:
             element = self.raw_data.find('div', class_='citacoes').get('cvuri')
-        i = element.find('titulo=') + 7 # índice de onde o título do artigo inicia
+        i = element.find('titulo=') + 7 # índice de onde o título do artigo inicia, em casos raros, não há título depois de "titulo="
         self.title = element[i:].split('&sequencial')[0]
         return self.title
     
@@ -42,8 +42,11 @@ class Article:
         year_element = self.raw_data.find('span', attrs={'data-tipo-ordenacao': 'ano'})
         siblings = list(year_element.next_siblings)
         messy_data = ' '.join([s.get_text() for s in siblings])
-        authors_string = messy_data.split(self.title)[0]
-        self.authors = list(map(lambda s: s.strip(' .'), authors_string.split(';')))
+        if self.title:
+            authors_string = messy_data.split(self.title)[0]
+            self.authors = list(map(lambda s: s.strip(' .'), authors_string.split(';')))
+        else: # Se não tiver sido possível extrair o título então não dá para extrair os autores
+            self.authors = []
 
     def __get_keywords(self):
         text = self.title
