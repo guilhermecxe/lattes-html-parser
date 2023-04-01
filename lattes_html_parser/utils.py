@@ -15,9 +15,9 @@ def keywords_from_text(text):
     from . import all_stopwords
 
     tokens = word_tokenize(unidecode(text).lower())
-    tokens = list(filter(not_only_punctuation, tokens))
-    tokens = list(filter(not_only_numbers, tokens))
-    tokens = list(filter(lambda token: len(token) > 1, tokens))
+    tokens = [token for token in tokens if     not_only_punctuation(token)
+                                           and not_only_numbers(token)
+                                           and len(token) > 1]
     keywords = [token for token in tokens if not token in all_stopwords]
 
     return keywords

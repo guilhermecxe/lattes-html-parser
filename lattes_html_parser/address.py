@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 
 class Address:
     def __init__(self, soup):
-        # self.soup = BeautifulSoup(address_html, 'html.parser')
         self.soup = soup
         self.__get_informations()
 

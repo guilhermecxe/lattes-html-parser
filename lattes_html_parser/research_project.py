@@ -10,12 +10,12 @@ class ResearchProject:
 
     def __str__(self):
         return f'<ResearchProject: {self.title}>'
-
-    def __get_period(self):
-        self.period = self.raw_data[0].get_text().strip()
     
     def __get_title(self):
         self.title = self.raw_data[2].get_text().strip()
+
+    def __get_period(self):
+        self.period = self.raw_data[0].get_text().strip()
 
     def __get_other_informations(self):
         raw_other_informations = self.raw_data[6]
