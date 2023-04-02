@@ -11,6 +11,12 @@ class Article:
         self.__get_authors()
         self.__get_keywords()
 
+    def __str__(self):
+        return f'<Article: {self.title}>'
+    
+    def __repr__(self):
+        return self.__str__()
+
     def __get_doi(self):
         doi_element = self.raw_data.find('a', class_='icone-doi')
         self.doi = doi_element.get('href') if doi_element else None

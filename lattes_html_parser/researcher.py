@@ -15,10 +15,10 @@ class Researcher:
         self.__get_last_update()
         self.__get_bio()
         self.__get_address()
-        self.__get_areas_of_expertise()
-        self.__get_research_projects()
-        self.__get_complete_articles()
         self.__get_emails()
+        self._areas_of_expertise = []
+        self._research_projects = []
+        self._complete_articles = []
 
     def __str__(self):
         return f'<Researcher: {self.name}>'
@@ -53,9 +53,13 @@ class Researcher:
         address_soup = self.soup.find('a', attrs={'name': 'Endereco'}).parent.div
         self.address = Address(address_soup) if address_soup.get_text() else None
     
-    def __get_areas_of_expertise(self):
+    @property
+    def areas_of_expertise(self):
         """Extracts researcher areas of expertise returning a list."""
-        self.areas_of_expertise = []
+
+        if self._areas_of_expertise:
+            return self._areas_of_expertise
+        
         areas_de_atuacao_box = self.soup.find('a', attrs={'name': 'AreasAtuacao'}).parent.div
         for area in areas_de_atuacao_box.children:
             text = area.get_text()
@@ -64,11 +68,14 @@ class Researcher:
                 area_of_expertise = area_of_expertise.replace('/ Área:', '>')
                 area_of_expertise = area_of_expertise.replace('/ Subárea:', '>')
                 area_of_expertise = area_of_expertise.replace('/Especialidade:', ' >')
-                self.areas_of_expertise.append(area_of_expertise.strip())
+                self._areas_of_expertise.append(area_of_expertise.strip())
+        return self._areas_of_expertise
 
-    def __get_research_projects(self):
+    @property
+    def research_projects(self):
         """Extracts all research projects and returns a list of ResearchProject instances."""
-        self.research_projects = []
+        if self._research_projects:
+            self._research_projects
 
         reasearch_projects_box = self.soup.find('a', attrs={'name': 'ProjetosPesquisa'})
         if not reasearch_projects_box:
@@ -82,12 +89,17 @@ class Researcher:
             project_raw_data = []
             for _ in range(7):
                 project_raw_data.append(next(rp_infos))
-            self.research_projects.append(ResearchProject(project_raw_data))
+            self._research_projects.append(ResearchProject(project_raw_data))
+        return self._research_projects
 
-    def __get_complete_articles(self):
+    @property
+    def complete_articles(self):
         """Extracts all articles published in journals and returns a list of Articles instances."""
-        articles_divs = self.soup.find_all('div', class_='artigo-completo')
-        self.complete_articles = [Article(article_div) for article_div in articles_divs]
+
+        if not self._complete_articles:
+            articles_divs = self.soup.find_all('div', class_='artigo-completo')
+            self._complete_articles = [Article(article_div) for article_div in articles_divs]
+        return self._complete_articles
 
     def get_articles_keywords(self, as_counter=True, top=10):
         """Returns a list of the top keywords in the researcher articles ranked by frequency
