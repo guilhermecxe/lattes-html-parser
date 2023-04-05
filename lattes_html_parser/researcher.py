@@ -7,50 +7,94 @@ from .article import Article
 from .address import Address
 
 class Researcher:
-    def __init__(self, html_path=None, html_str=None):
-        self.html_str = html_str
-        self.__get_soup(html_path, html_str)
-        self.__get_name()
-        self.__get_lattes_id()
-        self.__get_last_update()
-        self.__get_bio()
-        self.__get_address()
-        self.__get_emails()
+    """Representation of a researcher curriculum.
+    
+    `Researcher` is a class that reads HTML contents from a researcher curriculum
+    and provides a structured way to access all informations in it.
+
+    Parameters
+    ----------
+    html_path : str, default=None
+        Path to a HTML file.
+
+    html_str : str, default=None
+        HTML content in string format.
+
+    Attributes
+    ----------
+    areas_of_expertise
+    research_projects
+    complete_articles
+
+    """
+    def __init__(self, html_path:str=None, html_str:str=None):
+        self._html_str = html_str
+        self._html_path = html_path
+        self.name = None
+        self.lattes_id = None
+        self.last_update = None
+        self.bio = None
+        self.address = None
         self._areas_of_expertise = []
         self._research_projects = []
         self._complete_articles = []
 
-    def __str__(self):
+        self._get_soup()
+        self._get_name()
+        self._get_lattes_id()
+        self._get_last_update()
+        self._get_bio()
+        self._get_address()
+        self._get_emails()
+
+    def __str__(self) -> str:
         return f'<Researcher: {self.name}>'
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __get_soup(self, html_path=None, html_str=None):
-        """It receives the path to a curriculum in html format and creates the soup object,
-        which is used to extract researcher informations."""
-        if html_path:
-            with open(html_path, 'r', encoding='utf-8') as f:
-                self.html_str = f.read()
-                self.soup = BeautifulSoup(self.html_str, 'html.parser')
-        elif html_str:
-            self.soup = BeautifulSoup(html_str, 'html.parser')
+    def _get_soup(self) -> None:
+        """Create a BeautifulSoup instance of a HTML file or string.
+        
+        It uses the path specified to a curriculum in HTML format or the HTML content as str
+        to create a BeautifulSoup object.
 
-    def __get_name(self):
-        self.name = self.soup.find('h2', class_='nome').get_text()
+        Returns
+        -------
+        None
+            There is no significant return.
+        
+        Raises
+        ------
+        ValueError
+            If neither `html_path` or `html_str` is specified.
+        FileNotFoundError
+            If path specified in html_path is not found.
 
-    def __get_lattes_id(self):
-        lattes_link = self.soup.find('ul', class_='informacoes-autor').li.get_text().split('CV: ')[-1]
+        """
+        if self._html_path is None and self._html_str is None:
+            raise ValueError("Please specify at least one of html_path or html_str.")
+
+        if self._html_path:
+            with open(self._html_path, 'r', encoding='utf-8') as f:
+                self._html_str = f.read()
+        self._soup = BeautifulSoup(self._html_str, 'html.parser')
+
+    def _get_name(self):
+        self.name = self._soup.find('h2', class_='nome').get_text()
+
+    def _get_lattes_id(self):
+        lattes_link = self._soup.find('ul', class_='informacoes-autor').li.get_text().split('CV: ')[-1]
         self.lattes_id = lattes_link.split('/')[-1]
 
-    def __get_last_update(self):
-        self.last_update = self.soup.find('ul', class_='informacoes-autor').find_all('li')[-1].get_text().split('em ')[-1]
+    def _get_last_update(self):
+        self.last_update = self._soup.find('ul', class_='informacoes-autor').find_all('li')[-1].get_text().split('em ')[-1]
 
-    def __get_bio(self):
-        self.bio = self.soup.find('p', class_='resumo').get_text()
+    def _get_bio(self):
+        self.bio = self._soup.find('p', class_='resumo').get_text()
 
-    def __get_address(self):
-        address_soup = self.soup.find('a', attrs={'name': 'Endereco'}).parent.div
+    def _get_address(self):
+        address_soup = self._soup.find('a', attrs={'name': 'Endereco'}).parent.div
         self.address = Address(address_soup) if address_soup.get_text() else None
     
     @property
@@ -60,7 +104,7 @@ class Researcher:
         if self._areas_of_expertise:
             return self._areas_of_expertise
         
-        areas_de_atuacao_box = self.soup.find('a', attrs={'name': 'AreasAtuacao'}).parent.div
+        areas_de_atuacao_box = self._soup.find('a', attrs={'name': 'AreasAtuacao'}).parent.div
         for area in areas_de_atuacao_box.children:
             text = area.get_text()
             if 'Grande área' in text:
@@ -77,7 +121,7 @@ class Researcher:
         if self._research_projects:
             self._research_projects
 
-        reasearch_projects_box = self.soup.find('a', attrs={'name': 'ProjetosPesquisa'})
+        reasearch_projects_box = self._soup.find('a', attrs={'name': 'ProjetosPesquisa'})
         if not reasearch_projects_box:
             return
 
@@ -97,7 +141,7 @@ class Researcher:
         """Extracts all articles published in journals and returns a list of Articles instances."""
 
         if not self._complete_articles:
-            articles_divs = self.soup.find_all('div', class_='artigo-completo')
+            articles_divs = self._soup.find_all('div', class_='artigo-completo')
             self._complete_articles = [Article(article_div) for article_div in articles_divs]
         return self._complete_articles
 
