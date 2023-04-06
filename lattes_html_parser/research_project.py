@@ -1,4 +1,4 @@
-from .utils import keywords_from_text
+from .keywords import keywords_from_text
 
 class ResearchProject:
     def __init__(self, raw_data):

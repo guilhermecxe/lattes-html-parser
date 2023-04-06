@@ -1,15 +1,18 @@
-from .utils import keywords_from_text
+from bs4 import Tag
+from typing import List
+
+from .keywords import keywords_from_text
 
 class Article:
-    def __init__(self, raw_data):
-        self.raw_data = raw_data
-        self.__get_doi()
-        self.__get_year()
-        self.__get_jcr()
-        self.__get_title()
-        self.__get_publiser()
-        self.__get_authors()
-        self.__get_keywords()
+    def __init__(self, soup:Tag):
+        self._soup:Tag = soup
+        self._doi:str = None
+        self._year:int = None
+        self._jcr:str = None
+        self._publisher:str = None
+        self._title:str = None
+        self._authors:List[str] = None
+        self._keywords:List[str] = None
 
     def __str__(self):
         return f'<Article: {self.title}>'
@@ -17,43 +20,68 @@ class Article:
     def __repr__(self):
         return self.__str__()
 
-    def __get_doi(self):
-        doi_element = self.raw_data.find('a', class_='icone-doi')
-        self.doi = doi_element.get('href') if doi_element else None
+    @property
+    def doi(self) -> str:
+        if not self._doi:
+            doi_element = self._soup.find('a', class_='icone-doi')
+            self._doi = doi_element.get('href') if doi_element else None
+        return self._doi
 
-    def __get_year(self):
-        self.year = self.raw_data.find('span', attrs={'data-tipo-ordenacao': 'ano'}).get_text()
+    @property
+    def year(self) -> int:
+        if not self._year:
+            year = self._soup.find('span', attrs={'data-tipo-ordenacao': 'ano'}).get_text()
+            self._year = int(year)
+        return self._year
 
-    def __get_jcr(self):
-        jcr_element = self.raw_data.find('span', attrs={'data-tipo-ordenacao': 'jcr'})
-        self.jcr = jcr_element.get_text() if jcr_element else None
+    @property
+    def jcr(self) -> str:
+        if not self._jcr:
+            jcr_element = self._soup.find('span', attrs={'data-tipo-ordenacao': 'jcr'})
+            self._jcr = jcr_element.get_text() if jcr_element else None
+        return self._jcr
 
-    def __get_publiser(self):
-        try:
-            element = self.raw_data.find('div', class_='citado').get('cvuri')
-        except AttributeError:
-            element = self.raw_data.find('div', class_='citacoes').get('cvuri')
-        self.publisher = element.split('=')[-1]
+    @property
+    def publisher(self) -> str:
+        if not self._publisher:
+            try:
+                element = self._soup.find('div', class_='citado').get('cvuri')
+            except AttributeError:
+                element = self._soup.find('div', class_='citacoes').get('cvuri')
+            self._publisher = element.split('=')[-1]
+        return self._publisher
 
-    def __get_title(self):
-        try:
-            element = self.raw_data.find('div', class_='citado').get('cvuri')
-        except AttributeError:
-            element = self.raw_data.find('div', class_='citacoes').get('cvuri')
-        i = element.find('titulo=') + 7 # índice de onde o título do artigo inicia, em casos raros, não há título depois de "titulo="
-        self.title = element[i:].split('&sequencial')[0]
-        return self.title
+    @property
+    def title(self) -> str:
+        if not self._title:
+            try:
+                element = self._soup.find('div', class_='citado').get('cvuri')
+            except AttributeError:
+                element = self._soup.find('div', class_='citacoes').get('cvuri')
+            i = element.find('titulo=') + 7 # índice de onde o título do artigo inicia, em casos raros, não há título depois de "titulo="
+            self._title = element[i:].split('&sequencial')[0]
+        return self._title
     
-    def __get_authors(self):
-        year_element = self.raw_data.find('span', attrs={'data-tipo-ordenacao': 'ano'})
-        siblings = list(year_element.next_siblings)
-        messy_data = ' '.join([s.get_text() for s in siblings])
-        if self.title:
-            authors_string = messy_data.split(self.title)[0]
-            self.authors = list(map(lambda s: s.strip(' .'), authors_string.split(';')))
-        else: # Se não tiver sido possível extrair o título então não dá para extrair os autores
-            self.authors = []
+    @property
+    def authors(self) -> List[str]:
+        if not self._authors:
+            year_element = self._soup.find('span', attrs={'data-tipo-ordenacao': 'ano'})
+            siblings = list(year_element.next_siblings)
+            messy_data = ' '.join([s.get_text() for s in siblings])
+            if self.title: # Se não tiver sido possível extrair o título então não dá para extrair os autores
+                authors_string = messy_data.split(self.title)[0]
+                self._authors = list(map(lambda s: s.strip(' .'), authors_string.split(';')))
+        return self._authors
 
-    def __get_keywords(self):
-        text = self.title
-        self.keywords = keywords_from_text(text)
+    @property
+    def keywords(self) -> List[str]:
+        """Palavras-chave extraídas do título do artigo.
+        
+        São removidas *stopwords* em inglês e português, pontuações e tokens
+        definidos apenas por dígitos.
+        
+        """
+
+        if not self._keywords:
+            self._keywords = keywords_from_text(self.title)
+        return self._keywords

@@ -1,12 +1,9 @@
-"""HTML parser to represent researchers resumes from Plataforma Lattes.
-
-lattes_html_parser is a package aimed to extract and represent all
-informations from researchers' resumes from Plataforma Lattes.
+"""Pacote que extrai e representa informações do Currículos Lattes.
 
 """
 
 from .researcher import Researcher
-from .lattes import get_researchers, build_articles_database, build_researchers_report
+from .lattes import get_researchers, get_articles_report, get_researchers_report
 
 from nltk.corpus import stopwords
 
