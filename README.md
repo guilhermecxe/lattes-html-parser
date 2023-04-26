@@ -15,5 +15,7 @@ print(r.complete_articles[0]) # <Article: Hepatitis A and E among immigrants and
 print(len(r.complete_articles)) # 39
 ```
 
-- TODO: No perfil 0166245046472779 há duas seções intituladas "Artigos completos publicados em periódicos", sendo que uma pertence à seção "Educação e Popularização de C & T". Tratar isso de modo que seja extraído só a seção principal de artigos. Um dos problemas que isso pode causar é a repetição de artigos.
-- TODO: Investigar alguns artigos que são sem título. Encontramos alguns no currículo dos pesquisadores de ids: `1274351156087552` e `5147593668748865`.
+## TODO
+
+- No perfil de id `0166245046472779` há duas seções intituladas "Artigos completos publicados em periódicos", sendo que uma pertence à seção "Educação e Popularização de C & T". Tratar isso de modo que seja extraído só a seção principal de artigos. Um dos problemas que isso pode causar é a repetição de artigos.
+- Investigar alguns artigos que são sem título. Encontramos alguns nos currículos dos pesquisadores de ids: `1274351156087552` e `5147593668748865`.
